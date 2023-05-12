@@ -5,18 +5,17 @@
 #include <cryptopp/files.h>
 #include <cryptopp/osrng.h>
 
-#include "AccountWidget.h"
+#include "EndecryptWidget.h"
 
-AccountWidget::AccountWidget()
+EndecryptWidget::EndecryptWidget()
 {
     createWidgets();
     createLayouts();
     createConnections();
-
     loadKeys();
 }
 
-void AccountWidget::createWidgets()
+void EndecryptWidget::createWidgets()
 {
     m_fileLE = new QLineEdit();
 
@@ -26,7 +25,7 @@ void AccountWidget::createWidgets()
     m_generateButton = new QPushButton(tr("Generate Keys"));
 }
 
-void AccountWidget::createLayouts()
+void EndecryptWidget::createLayouts()
 {
     QGridLayout* mainLayout = new QGridLayout();
     mainLayout->addWidget(m_fileLE, 0, 0, 1, 1);
@@ -43,13 +42,13 @@ void AccountWidget::createLayouts()
     setLayout(mainLayout);
 }
 
-void AccountWidget::createConnections()
+void EndecryptWidget::createConnections()
 {
     connect(m_browseButton, SIGNAL(clicked()), this, SLOT(browseButtonClicked()));
     connect(m_generateButton, SIGNAL(clicked()), this, SLOT(generateButtonClicked()));
 }
 
-void AccountWidget::loadKeys()
+void EndecryptWidget::loadKeys()
 {
     if (QFile::exists("rsaPrivate.key"))
     {
@@ -64,7 +63,7 @@ void AccountWidget::loadKeys()
     }
 }
 
-void AccountWidget::encryptButtonClicked()
+void EndecryptWidget::encryptButtonClicked()
 {
     CryptoPP::AutoSeededRandomPool rng;
     CryptoPP::RSAES_OAEP_SHA_Encryptor e(m_rsaPublic);
@@ -76,7 +75,7 @@ void AccountWidget::encryptButtonClicked()
     ); // StringSource
 }
 
-void AccountWidget::decryptButtonClicked()
+void EndecryptWidget::decryptButtonClicked()
 {
     CryptoPP::AutoSeededRandomPool rng;
     CryptoPP::RSAES_OAEP_SHA_Decryptor d(m_rsaPrivate);
@@ -88,13 +87,13 @@ void AccountWidget::decryptButtonClicked()
     ); // StringSource
 }
 
-void AccountWidget::browseButtonClicked()
+void EndecryptWidget::browseButtonClicked()
 {
     m_file = QFileDialog::getOpenFileName(this);
     m_fileLE->setText(m_file);
 }
 
-void AccountWidget::generateButtonClicked()
+void EndecryptWidget::generateButtonClicked()
 {
     // Generate
     CryptoPP::AutoSeededRandomPool rng;

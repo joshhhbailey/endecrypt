@@ -4,11 +4,11 @@ target_sources(${TARGETNAME} PRIVATE
 	# .cpp
 	${PROJECT_SOURCE_DIR}/src/app/main.cpp
 	${PROJECT_SOURCE_DIR}/src/app/MainWindow.cpp
-	${PROJECT_SOURCE_DIR}/src/app/AccountWidget.cpp
+	${PROJECT_SOURCE_DIR}/src/app/EndecryptWidget.cpp
 	
 	# .h
 	${PROJECT_SOURCE_DIR}/include/app/MainWindow.h
-	${PROJECT_SOURCE_DIR}/include/app/AccountWidget.h
+	${PROJECT_SOURCE_DIR}/include/app/EndecryptWidget.h
 )
 
 target_include_directories(${TARGETNAME} PRIVATE ${CMAKE_SOURCE_DIR}/include/app)

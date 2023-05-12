@@ -1,5 +1,5 @@
-#ifndef ACCOUNTWIDGET_H_
-#define ACCOUNTWIDGET_H_
+#ifndef EndecryptWidget_H_
+#define EndecryptWidget_H_
 
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QPushButton>
@@ -10,11 +10,11 @@
 
 #include <string>
 
-class AccountWidget : public QGroupBox
+class EndecryptWidget : public QGroupBox
 {
     Q_OBJECT
 public:
-    AccountWidget();
+    EndecryptWidget();
 
 public slots:
     void encryptButtonClicked();
@@ -48,4 +48,4 @@ private:
     std::string m_decrypted;
 };
 
-#endif  // _ACCOUNTWIDGET_H_
+#endif  // _EndecryptWidget_H_

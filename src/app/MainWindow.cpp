@@ -26,14 +26,14 @@ void MainWindow::createWidgets()
     m_mainWidget = new QWidget();
     setCentralWidget(m_mainWidget);
 
-    m_accountWidget = new AccountWidget();
+    m_endecryptWidget = new EndecryptWidget();
 }
 
 void MainWindow::createLayouts()
 {
     QHBoxLayout* mainLayout = new QHBoxLayout();
     mainLayout->setContentsMargins(0, 0, 0, 0);
-    mainLayout->addWidget(m_accountWidget);
+    mainLayout->addWidget(m_endecryptWidget);
     m_mainWidget->setLayout(mainLayout);
 }
 

@@ -4,7 +4,7 @@
 #include <QtWidgets/QMainWindow>
 #include <QtGui/QPalette>
 
-#include "AccountWidget.h"
+#include "EndecryptWidget.h"
 
 class MainWindow : public QMainWindow
 {
@@ -22,7 +22,7 @@ private:
 
     // Widgets
     QWidget* m_mainWidget;
-    AccountWidget* m_accountWidget;
+    EndecryptWidget* m_endecryptWidget;
 };
 
 #endif  // _MAINWINDOW_H_
