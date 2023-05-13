@@ -11,6 +11,12 @@ project(${TARGETNAME})
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Find Qt packages on Mac (change Qt version depending on your system)
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+	set(CMAKE_PREFIX_PATH "~/dev/tools/Qt/6.5.0/macos/lib/cmake")
+	find_package(Qt6 REQUIRED COMPONENTS Core Gui widgets)
+endif()
+
 # Package setup
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets)
 qt_standard_project_setup()

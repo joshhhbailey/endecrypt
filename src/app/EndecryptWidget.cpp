@@ -50,15 +50,15 @@ void EndecryptWidget::createConnections()
 
 void EndecryptWidget::loadKeys()
 {
-    if (QFile::exists("rsaPrivate.key"))
+    if (QFile::exists(m_prefix + "rsaPrivate.key"))
     {
-        CryptoPP::FileSource inputPrivate("rsaPrivate.key", true);
+        CryptoPP::FileSource inputPrivate((m_prefix.toStdString() + "rsaPrivate.key").c_str(), true);
         m_rsaPrivate.BERDecode(inputPrivate);
     }
 
-    if (QFile::exists("rsaPublic.key"))
+    if (QFile::exists(m_prefix + "rsaPublic.key"))
     {
-        CryptoPP::FileSource inputPublic("rsaPublic.key", true);
+        CryptoPP::FileSource inputPublic((m_prefix.toStdString() + "rsaPublic.key").c_str(), true);
         m_rsaPublic.BERDecode(inputPublic);
     }
 }
@@ -104,9 +104,9 @@ void EndecryptWidget::generateButtonClicked()
     m_rsaPublic = CryptoPP::RSA::PublicKey(params);
 
     // Save keys
-    CryptoPP::FileSink outputPrivate("rsaPrivate.key");
+    CryptoPP::FileSink outputPrivate((m_prefix.toStdString() + "rsaPrivate.key").c_str());
     m_rsaPrivate.DEREncode(outputPrivate);
 
-    CryptoPP::FileSink outputPublic("rsaPublic.key");
+    CryptoPP::FileSink outputPublic((m_prefix.toStdString() + "rsaPublic.key").c_str());
     m_rsaPublic.DEREncode(outputPublic);
 }

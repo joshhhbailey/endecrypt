@@ -46,6 +46,13 @@ private:
     std::string m_plain;
     std::string m_encrypted;
     std::string m_decrypted;
+
+    #ifdef _WIN32
+        QString m_prefix = "";
+    #elif __APPLE__
+        QString m_prefix = "/Users/$USER/";
+    #endif
+    
 };
 
 #endif  // _EndecryptWidget_H_
