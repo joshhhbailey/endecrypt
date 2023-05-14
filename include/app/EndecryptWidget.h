@@ -5,6 +5,7 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QFileDialog>
+#include <QtWidgets/QLabel>
 
 #include <cryptopp/rsa.h>
 
@@ -28,9 +29,12 @@ private:
     void createConnections();
     
     void loadKeys();
+    QString readFile();
+    void writeFile(std::string _contents, bool _ende);  // _ende: true = encrypt, false = decrypt
 
     QLineEdit* m_fileLE;
-    QString m_file;
+    QString m_filePath;
+    QLabel* m_logLabel;
 
     // Buttons
     QWidget* m_buttonsWidget;
@@ -50,7 +54,8 @@ private:
     #ifdef _WIN32
         QString m_prefix = "";
     #elif __APPLE__
-        QString m_prefix = "/Users/$USER/";
+        QString user = std::getenv("USER");
+        QString m_prefix = "/Users/" + user + "/";
     #endif
     
 };
