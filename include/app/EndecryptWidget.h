@@ -46,7 +46,7 @@ private:
 
     QString m_filePath;
     QString m_key;
-
+    
     std::string m_plainText;
     std::string m_encryptedText;
     std::string m_decryptedText;

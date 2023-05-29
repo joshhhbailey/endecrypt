@@ -112,6 +112,12 @@ void EndecryptWidget::encryptButtonClicked()
         return;
     }
 
+    if (m_key == "")
+    {
+        m_logLabel->setText(tr("Key is empty... Cannot encrypt."));
+        return;
+    }
+
     // Encrypt (MAC - https://www.cryptopp.com/wiki/DefaultEncryptorWithMAC)
     CryptoPP::StringSource ss1(m_plainText, true,
     new CryptoPP::DefaultEncryptorWithMAC(
@@ -123,7 +129,7 @@ void EndecryptWidget::encryptButtonClicked()
     );
 
     writeFile(m_encryptedText, true);
-    m_logLabel->setText(tr("Encryption complete."));
+    m_logLabel->setText("Encryption complete. Output: " + m_prefix + "out.en");
 }
 
 void EndecryptWidget::decryptButtonClicked()
@@ -133,6 +139,12 @@ void EndecryptWidget::decryptButtonClicked()
     if (m_encryptedText == "")
     {
         m_logLabel->setText(tr("File is empty... Nothing to decrypt."));
+        return;
+    }
+
+    if (m_key == "")
+    {
+        m_logLabel->setText(tr("Key is empty... Cannot decrypt."));
         return;
     }
 
@@ -147,7 +159,7 @@ void EndecryptWidget::decryptButtonClicked()
     );
 
     writeFile(m_decryptedText, false);
-    m_logLabel->setText(tr("Decryption complete."));
+    m_logLabel->setText("Decryption complete. Output: " + m_prefix + "out.de");
 }
 
 void EndecryptWidget::browseButtonClicked()
