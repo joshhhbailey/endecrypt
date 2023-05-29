@@ -7,4 +7,6 @@
   - [Overview](#overview)
 
 ## Overview
-A basic encryption/decryption application implementing the following: https://www.cryptopp.com/wiki/DefaultEncryptorWithMAC
+A very basic encryption/decryption application implementing the following: https://www.cryptopp.com/wiki/DefaultEncryptorWithMAC
+
+![](endecrypt_ui.png)
