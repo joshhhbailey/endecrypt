@@ -2,8 +2,9 @@
 #include <QtCore/QFile>
 #include <QtCore/QTextStream>
 
-#include <cryptopp/files.h>
-#include <cryptopp/osrng.h>
+#include <cryptopp/default.h>
+#include <cryptopp/filters.h>
+#include <cryptopp/hex.h>
 
 #include "EndecryptWidget.h"
 
@@ -12,59 +13,43 @@ EndecryptWidget::EndecryptWidget()
     createWidgets();
     createLayouts();
     createConnections();
-    loadKeys();
 }
 
 void EndecryptWidget::createWidgets()
 {
     m_fileLE = new QLineEdit();
-    m_logLabel = new QLabel("Welcome!");
+    m_keyLE = new QLineEdit();
+    m_keyLE->setEchoMode(QLineEdit::Password);
 
+    m_fileLabel = new QLabel(tr("File:"));
+    m_keyLabel = new QLabel(tr("Endecrypt key:"));
+    m_logLabel = new QLabel(tr("Welcome!"));
+    
     m_encryptButton = new QPushButton(tr("Encrypt"));
     m_decryptButton = new QPushButton(tr("Decrypt"));
     m_browseButton = new QPushButton(tr("Browse"));
-    m_generateButton = new QPushButton(tr("Generate Keys"));
 }
 
 void EndecryptWidget::createLayouts()
 {
     QGridLayout* mainLayout = new QGridLayout();
-    mainLayout->addWidget(m_fileLE, 0, 0, 1, 1);
-    mainLayout->addWidget(m_browseButton, 0, 1, 1, 1);
-
-    m_buttonsWidget = new QWidget();
-    QHBoxLayout* buttonsLayout = new QHBoxLayout();
-    buttonsLayout->addWidget(m_generateButton);
-    buttonsLayout->addWidget(m_encryptButton);
-    buttonsLayout->addWidget(m_decryptButton);
-
-    m_buttonsWidget->setLayout(buttonsLayout);
-    mainLayout->addWidget(m_buttonsWidget, 1, 0, 1, 2);
-    mainLayout->addWidget(m_logLabel, 2, 0, 1, 2);
+    mainLayout->addWidget(m_fileLabel, 0, 0, 1, 1);
+    mainLayout->addWidget(m_fileLE, 0, 1, 1, 1);
+    mainLayout->addWidget(m_browseButton, 0, 2, 1, 1);
+    mainLayout->addWidget(m_keyLabel, 1, 0, 1, 1);
+    mainLayout->addWidget(m_keyLE, 1, 1, 1, 1);
+    mainLayout->addWidget(m_encryptButton, 1, 2, 1, 1);
+    mainLayout->addWidget(m_decryptButton, 1, 3, 1, 1);
+    mainLayout->addWidget(m_logLabel, 2, 0, 1, 4);
     setLayout(mainLayout);
 }
 
 void EndecryptWidget::createConnections()
 {
+    connect(m_keyLE, SIGNAL(textChanged(const QString &)), this, SLOT(keyChanged(const QString &)));
     connect(m_browseButton, SIGNAL(clicked()), this, SLOT(browseButtonClicked()));
-    connect(m_generateButton, SIGNAL(clicked()), this, SLOT(generateButtonClicked()));
     connect(m_encryptButton, SIGNAL(clicked()), this, SLOT(encryptButtonClicked()));
     connect(m_decryptButton, SIGNAL(clicked()), this, SLOT(decryptButtonClicked()));
-}
-
-void EndecryptWidget::loadKeys()
-{
-    if (QFile::exists(m_prefix + "rsaPrivate.key"))
-    {
-        CryptoPP::FileSource inputPrivate((m_prefix.toStdString() + "rsaPrivate.key").c_str(), true);
-        m_rsaPrivate.BERDecode(inputPrivate);
-    }
-
-    if (QFile::exists(m_prefix + "rsaPublic.key"))
-    {
-        CryptoPP::FileSource inputPublic((m_prefix.toStdString() + "rsaPublic.key").c_str(), true);
-        m_rsaPublic.BERDecode(inputPublic);
-    }
 }
 
 QString EndecryptWidget::readFile()
@@ -112,68 +97,61 @@ void EndecryptWidget::writeFile(std::string _contents, bool _ende)
     out << _contents.c_str();
 }
 
+void EndecryptWidget::keyChanged(const QString &)
+{
+    m_key = m_keyLE->text();
+}
+
 void EndecryptWidget::encryptButtonClicked()
 {
-    m_plain = readFile().toStdString();
+    m_plainText = readFile().toStdString();
 
-    // Encrypt
-    CryptoPP::AutoSeededRandomPool rng;
-    CryptoPP::RSAES_OAEP_SHA_Encryptor e(m_rsaPublic);
+    if (m_plainText == "")
+    {
+        m_logLabel->setText(tr("File is empty... Nothing to encrypt."));
+        return;
+    }
 
-    CryptoPP::StringSource ss1(m_plain, true,
-        new CryptoPP::PK_EncryptorFilter(rng, e,
-            new CryptoPP::StringSink(m_encrypted)
-        ) // PK_EncryptorFilter
-    ); // StringSource
+    // Encrypt (MAC - https://www.cryptopp.com/wiki/DefaultEncryptorWithMAC)
+    CryptoPP::StringSource ss1(m_plainText, true,
+    new CryptoPP::DefaultEncryptorWithMAC(
+        (CryptoPP::byte*)&m_key.toStdString()[0], m_key.toStdString().size(),
+            new CryptoPP::HexEncoder(
+                new CryptoPP::StringSink(m_encryptedText)
+            )
+        )
+    );
 
-    writeFile(m_encrypted, true);
-
-    m_logLabel->setText("Encryption complete.");
+    writeFile(m_encryptedText, true);
+    m_logLabel->setText(tr("Encryption complete."));
 }
 
 void EndecryptWidget::decryptButtonClicked()
 {
-    m_encrypted = readFile().toStdString();
-    //QString s = QString::fromStdString(m_encrypted);
-    //m_logLabel->setText(s);
+    m_encryptedText = readFile().toStdString();
 
-    // Decrypt
-    CryptoPP::AutoSeededRandomPool rng;
-    CryptoPP::RSAES_OAEP_SHA_Decryptor d(m_rsaPrivate);
+    if (m_encryptedText == "")
+    {
+        m_logLabel->setText(tr("File is empty... Nothing to decrypt."));
+        return;
+    }
 
-    CryptoPP::StringSource ss2(m_encrypted, true,
-        new CryptoPP::PK_DecryptorFilter(rng, d,
-            new CryptoPP::StringSink(m_decrypted)
-        ) // PK_DecryptorFilter
-    ); // StringSource
+    // Decrypt (MAC - https://www.cryptopp.com/wiki/DefaultEncryptorWithMAC)
+    CryptoPP::StringSource ss2(m_encryptedText, true,
+    new CryptoPP::HexDecoder(
+        new CryptoPP::DefaultDecryptorWithMAC(
+            (CryptoPP::byte*)&m_key.toStdString()[0], m_key.toStdString().size(),
+                new CryptoPP::StringSink(m_decryptedText)
+            )
+        )
+    );
 
-    writeFile(m_decrypted, false);
-
-    m_logLabel->setText("Decryption complete.");
+    writeFile(m_decryptedText, false);
+    m_logLabel->setText(tr("Decryption complete."));
 }
 
 void EndecryptWidget::browseButtonClicked()
 {
     m_filePath = QFileDialog::getOpenFileName(this);
     m_fileLE->setText(m_filePath);
-}
-
-void EndecryptWidget::generateButtonClicked()
-{
-    // Generate
-    CryptoPP::AutoSeededRandomPool rng;
-    CryptoPP::InvertibleRSAFunction params;
-    params.GenerateRandomWithKeySize(rng, 2048);
-
-    m_rsaPrivate = CryptoPP::RSA::PrivateKey(params);
-    m_rsaPublic = CryptoPP::RSA::PublicKey(params);
-
-    // Save keys
-    CryptoPP::FileSink outputPrivate((m_prefix.toStdString() + "rsaPrivate.key").c_str());
-    m_rsaPrivate.DEREncode(outputPrivate);
-
-    CryptoPP::FileSink outputPublic((m_prefix.toStdString() + "rsaPublic.key").c_str());
-    m_rsaPublic.DEREncode(outputPublic);
-
-    m_logLabel->setText("Key generation complete.");
 }

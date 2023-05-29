@@ -7,8 +7,6 @@
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QLabel>
 
-#include <cryptopp/rsa.h>
-
 #include <string>
 
 class EndecryptWidget : public QGroupBox
@@ -18,22 +16,26 @@ public:
     EndecryptWidget();
 
 public slots:
+    void keyChanged(const QString &);
     void encryptButtonClicked();
     void decryptButtonClicked();
     void browseButtonClicked();
-    void generateButtonClicked();
 
 private:
     void createWidgets();
     void createLayouts();
     void createConnections();
     
-    void loadKeys();
     QString readFile();
     void writeFile(std::string _contents, bool _ende);  // _ende: true = encrypt, false = decrypt
 
+    // Line edits
     QLineEdit* m_fileLE;
-    QString m_filePath;
+    QLineEdit* m_keyLE;
+
+    // Labels
+    QLabel* m_fileLabel;
+    QLabel* m_keyLabel;
     QLabel* m_logLabel;
 
     // Buttons
@@ -41,23 +43,21 @@ private:
     QPushButton* m_encryptButton;
     QPushButton* m_decryptButton;
     QPushButton* m_browseButton;
-    QPushButton* m_generateButton;
 
-    // Keys
-    CryptoPP::RSA::PrivateKey m_rsaPrivate;
-    CryptoPP::RSA::PublicKey m_rsaPublic;
+    QString m_filePath;
+    QString m_key;
 
-    std::string m_plain;
-    std::string m_encrypted;
-    std::string m_decrypted;
+    std::string m_plainText;
+    std::string m_encryptedText;
+    std::string m_decryptedText;
 
     #ifdef _WIN32
-        QString m_prefix = "";
+        QString m_user = std::getenv("USERNAME");
+        QString m_prefix = "C:/Users/" + m_user + "/";
     #elif __APPLE__
-        QString user = std::getenv("USER");
-        QString m_prefix = "/Users/" + user + "/";
+        QString m_user = std::getenv("USER");
+        QString m_prefix = "/Users/" + m_user + "/";
     #endif
-    
 };
 
 #endif  // _EndecryptWidget_H_

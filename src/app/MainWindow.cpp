@@ -6,9 +6,13 @@
 
 MainWindow::MainWindow()
 {
-    setWindowTitle(tr("endecrypt v1.0.0"));
+    setWindowTitle("endecrypt v1.0.0");
     setFixedWidth(720);
-    setFixedHeight(130);
+    #ifdef _WIN32
+        setFixedHeight(150);
+    #elif __APPLE__
+        setFixedHeight(130);
+    #endif
 
     createMenus();
     createWidgets();
