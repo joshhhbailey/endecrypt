@@ -65,10 +65,8 @@ QString EndecryptWidget::readFile()
 
     // Extract file contents
     QTextStream in(&file);
-    while(!in.atEnd())
-    {
-        contents += in.readLine();
-    }
+    contents = in.readAll();
+
     return contents;
 }
 
